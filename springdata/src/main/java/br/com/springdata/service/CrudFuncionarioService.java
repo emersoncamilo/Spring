@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.com.springdata.orm.Cargo;
@@ -53,7 +57,7 @@ public class CrudFuncionarioService {
 				atualizar(scanner);
 				break;
 			case 3:
-				visualizar();
+				visualizar(scanner);
 				break;
 			case 4:
 				deletar(scanner);
@@ -146,8 +150,26 @@ public class CrudFuncionarioService {
         System.out.println("Alterado");
 	}
 	
-	private void visualizar() {
-		Iterable<Funcionario> funcionarios = funcionarioRepository.findAll();
+	private void visualizar(Scanner scanner) {
+		System.out.println("Qual pagina deseja visualizar?");
+		Integer page = scanner.nextInt();
+		/*
+		importar de (import org.springframework.data.domain.Pageable;)
+		a Page request tem 3 parametros
+		1º numero de paginas retornadas
+		2º quantidade de registros por pagina
+		3º ordenação
+		*/
+		//Pageable pageable = PageRequest.of(page, 5, Sort.unsorted());//sem ordenação
+		Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.ASC, "salario"));//ordenado por nome
+		
+		/* aqui é só chamar o findAll colocando o parametro pageable, que retornara
+		 * paginas com as informações desejadas*/
+		Page<Funcionario> funcionarios = funcionarioRepository.findAll(pageable);
+		
+		System.out.println("\nQuantidade de páginas: "+funcionarios);
+		System.out.println("Página Atual: "+ funcionarios.getNumber());
+		
 		funcionarios.forEach(funcionario -> System.out.println(funcionario));
 	}
 	
